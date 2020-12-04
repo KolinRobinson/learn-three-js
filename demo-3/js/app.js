@@ -3,10 +3,9 @@
 function main() {
     const canvas = document.querySelector('#demo');
     const renderer = new THREE.WebGLRenderer({ canvas });
-    renderer.setSize(window.innerWidth, window.innerHeight);
 
     const fov = 75; //Поле зрения в градусах
-    const aspect = window.innerWidth / window.innerHeight; // соотношение сторон холста
+    const aspect = 2; // соотношение сторон холста
     const near = 0.1;
     const far = 5;
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -47,10 +46,28 @@ function main() {
         makeInstance(geometry, allColors[Math.floor(Math.random() * allColors.length)], 3),
     ];
 
+    function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement; // получаем отрендеренный элемент
+        const pixelRatio = window.devicePixelRatio; //получаем количество точек на 1 пс
+        const width = canvas.clientWidth * pixelRatio | 0; // его ширину
+        const height = canvas.clientHeight * pixelRatio | 0; // высоту
+        const needResize = canvas.width !== width || canvas.height !== height; //проверяем или они совпадают
+        if (needResize) {
+            renderer.setSize(width, height, false);
+        }
+        return needResize;
+    }
+
 
 
     function render(time) {
         time *= 0.001; // конвертировать время в секунды
+
+        if (resizeRendererToDisplaySize(renderer)) {
+            const canvas = renderer.domElement;
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+        }
 
         cubes.forEach((cube, ndx) => {
             const speed = 1 + ndx * .1;
