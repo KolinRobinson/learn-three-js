@@ -14,7 +14,7 @@ function main() {
 
     const scene = new THREE.Scene();
 
-    let allColors = [0xFF00FF, 0xFF8000, 0x00FF00, 0x00FFFF];
+    let allColors = [0xFF00FF, 0xFF8000, 0x00FF00, 0x00FFFF, 0x0080FF, 0xFF0000, 0x0000FF];
 
     const color = allColors[Math.floor(Math.random() * allColors.length)]; // цвет освещения
     const intensity = 1;
@@ -29,18 +29,35 @@ function main() {
     const boxDepth = 1; // глубина
 
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-    const material = new THREE.MeshPhongMaterial({ color: 0x44aa88 });
 
-    const cube = new THREE.Mesh(geometry, material);
+    function makeInstance(geometry, color, x) {
+        const material = new THREE.MeshPhongMaterial({ color });
 
-    scene.add(cube);
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        cube.position.x = x;
+
+        return cube;
+    }
+
+    const cubes = [
+        makeInstance(geometry, allColors[Math.floor(Math.random() * allColors.length)], 0),
+        makeInstance(geometry, allColors[Math.floor(Math.random() * allColors.length)], -3),
+        makeInstance(geometry, allColors[Math.floor(Math.random() * allColors.length)], 3),
+    ];
+
 
 
     function render(time) {
         time *= 0.001; // конвертировать время в секунды
 
-        cube.rotation.x = time; // в круге 2 пи радиана, поворот при параметре 0.001 происходит за 6.28с
-        cube.rotation.y = time;
+        cubes.forEach((cube, ndx) => {
+            const speed = 1 + ndx * .1;
+            const rot = time * speed;
+            cube.rotation.x = rot;
+            cube.rotation.y = rot;
+        });
 
         renderer.render(scene, camera);
 
